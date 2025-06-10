@@ -4,7 +4,7 @@ import pandas as pd
 # Load local HTML file
 
 country = input("Enter the code of the country you want the data(e.g. BRA, ECU, ARG, USA) ")
-path = "countries/imo_results" + country+ ".html"
+path = "countries/imo_results_" + country+ ".html"
 with open(path, "r", encoding="utf-8") as f:
     html = f.read()
 
