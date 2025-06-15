@@ -40,9 +40,20 @@ subject_dict = {
     2004: ("G", "A"),
 }
 
+MIN_EXPECTED_COLUMNS = 10
 
-first_year = int(input("1st year "))
-last_year = int(input("last year "))
+while True:
+    try:
+        first_year = int(input("Enter the first year for analysis (e.g., 2014): "))
+        last_year = int(input("Enter the last year for analysis (e.g., 2024): "))
+        if first_year > last_year:
+            print("First year cannot be greater than last year. Please re-enter.")
+        else:
+            break
+    except ValueError:
+        print("Invalid year input. Please enter a number.")
+
+        
 count = {
         "A": 0,
         "C": 0,
@@ -67,7 +78,7 @@ for year in range(first_year, last_year + 1):
 # Extract all rows (skip header)
 for row in table.find_all("tr")[1:]:
     cols = row.find_all("td")
-    if len(cols) < 10:
+    if len(cols) < MIN_EXPECTED_COLUMNS:
         continue
 
     year_text = cols[0].text.strip()
@@ -118,21 +129,36 @@ subject_sums = [0, 0, 0, 0]
 
 # Accumulate subject-wise scores
 for _, row in df.iterrows():
-    year = row["Year"]
     p1 = row["P1"]
     p4 = row["P4"]
+    subj1 = row["P1-Rama"]
+    subj4 = row["P4-Rama"] 
 
-    if year in subject_dict:
-        subj1, subj4 = subject_dict[year]
+    # Only add if the subject was successfully mapped (not "NA")
+    if subj1 != "NA":
         subject_sums[subject_index[subj1]] += p1
+    if subj4 != "NA": 
         subject_sums[subject_index[subj4]] += p4
 
 # Print results
-print(f"Algebra (A): {subject_sums[0]/count['A']}")
-print(f"Combinatorics (C): {subject_sums[1]/count['C']}")
-print(f"Geometry (G): {subject_sums[2]/count['G']}")
-print(f"Number Theory (N): {subject_sums[3]/count['N']}")
+try:
+    print(f"Algebra (A): {subject_sums[0]/count['A']}")
+except:
+    print(f"Algebra (A): No data")
 
+try:
+    print(f"Combinatorics (C): {subject_sums[1]/count['C']}")
+except:
+    print(f"Combinatorics (C): No data")
+
+try:
+    print(f"Geometry (G): {subject_sums[2]/count['G']}")
+except:
+    print(f"Geometry (G): No data")
+try:
+    print(f"Number Theory (N): {subject_sums[3]/count['N']}")
+except:
+    print(f"Number Theory (N): No data")
 print("-----------------------------------------------------")
 # Combine P1 and P4 into a long-form table with subject
 p1_df = df[["Year", "Name", "P1", "P1-Rama"]].rename(columns={"P1": "Score", "P1-Rama": "Subject"})
